@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+exec 3>&1
+exec 1>&2
+
+set +x
+
+payload=$(mktemp /tmp/bldr-resource-check.XXXXXX)
+
+cat > "${payload}" <&0
+
+source_uri="$(jq -r '.source.bldr_url' < "${payload}")"
+
+if [[ source_uri =~ .*http.* ]]; then
+    base_uri=$source_uri
+else
+    base_uri="https://bldr.habitat.sh/v1/depot/"
+fi
+
+origin="$(jq -r '.source.origin' < "${payload}")"
+name="$(jq -r '.source.name' < "${payload}")"
+version="$(jq -r '.source.version' < "${payload}")"
+build_id="$(jq -r '.source.build_id' < "${payload}")"
+
+src_channel="$(jq -r '.source.channel' < "${payload}")"
+
+if [[ $src_channel == "null" ]]; then
+    channel="stable"
+else
+    channel=$src_channel
+fi
+
+curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}/latest"  2>/dev/null | jq '{ version: {ref: (.ident.version + "" + .ident.release)}}'  >&3
+
