@@ -23,6 +23,7 @@ origin="$(jq -r '.source.origin' < "${payload}")"
 name="$(jq -r '.source.name' < "${payload}")"
 version="$(jq -r '.source.version' < "${payload}")"
 build_id="$(jq -r '.source.build_id' < "${payload}")"
+src_platform="$(jq -r '.source.platform' < "${payload}")"
 
 src_channel="$(jq -r '.source.channel' < "${payload}")"
 
@@ -32,4 +33,12 @@ else
     channel=$src_channel
 fi
 
-curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}"  2>/dev/null | jq '[.data | to_entries[] | {"ref": (.value.version + "." + .value.release)} ]'  >&3
+if [[ $src_platform == "null" ]]; then
+    platform="x86_64-linux"
+else
+    platform=$src_platform
+fi
+
+echo "Platform is $platform"
+
+curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}"  2>/dev/null | jq "[.data | to_entries[] | select(.value.platforms | index(\"${platform}\")) | {\"ref\": (.value.version + \".\" + .value.release )} ]"  >&3
