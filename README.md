@@ -1,6 +1,6 @@
 # Bldr resource
 
-a Concourse resource for triggering builds when new habitat packages are promoted to channels
+A Concourse resource for triggering builds when new habitat packages are promoted to channels
 
 ## Source configuration
 
