@@ -7,6 +7,7 @@ a Concourse resource for triggering builds when new habitat packages are promote
 * `origin`: _Required_ the package origin
 * `name`: _Required_ the package name
 * `channel`: _Optional_ the bldr channel to watch. Defaults to stable.
+* `platform`: _Optional_ the package platform to filter on. Defaults to x86_64-linux
 * `bldr_url`: _Optional_ the bldr server to check against. Defaults to https://bldr.habitat.sh/v1/depot/.
 
 ### Example
