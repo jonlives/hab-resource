@@ -34,6 +34,8 @@ jobs:
   plan:
     - get: hab-pkg
       trigger: true
+    - put: hab-pkg
+      params: {promote_to: prod}  
 ```
 
 ## Behaviour
@@ -43,6 +45,9 @@ Will return a list (in ascending order) of all versions of a package on the spec
 
 ### `in`: Get the latest package version on the specified channel
 Will return the version and release numbers for the most recently promoted version of the specified package to the specified channel
+
+### `out`: Promotes the latest specified package version to the specified channel
+Will promote the latest package version on the configured channel to the specified promotion channel
 
 ## Attribution
 This resource borrows very very heavily from eeyun/bldr-resource

@@ -7,7 +7,7 @@ exec 1>&2
 
 set +x
 
-payload=$(mktemp /tmp/bldr-resource-check.XXXXXX)
+payload=$(mktemp $TMPDIR/hab-resource.XXXXXX)
 
 cat > "${payload}" <&0
 
@@ -39,6 +39,8 @@ else
     platform=$src_platform
 fi
 
+echo "Platform is $platform"
 
-curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}/latest"  2>/dev/null | jq ". | select(.target | contains(\"${platform}\")) | { version: {ref: (.ident.version + \"\" + .ident.release)}}"  >&3
+curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}/latest"  2>/dev/null | jq ". | select(.target | contains(\"${platform}\")) | { version: {ref: (.ident.version + \"/\" + .ident.release)}}"  > "$1/${origin}_${name}"
 
+curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}/latest"  2>/dev/null | jq ". | select(.target | contains(\"${platform}\")) | { version: {ref: (.ident.version + \"/\" + .ident.release)}}"  >&3

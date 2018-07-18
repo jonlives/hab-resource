@@ -7,6 +7,30 @@ exec 1>&2
 
 set +x
 
-payload=$(mktemp /tmp/resource-in.XXXXXX)
+payload=$(mktemp $TMPDIR/hab-resource.XXXXXX)
+keys_cache=$(mktemp /tmp/hab_cache_keys_path.XXXXXX)
+trap "rm -f ${keys_cache}" INT QUIT TERM EXIT
+export HAB_CACHE_KEYS_PATH=${keys_cache}
 
-echo "[]" >&3
+
+cat > "${payload}" <&0
+
+origin="$(jq -r '.source.origin' < "${payload}")"
+name="$(jq -r '.source.name' < "${payload}")"
+channel="$(jq -r '.source.channel' < "${payload}")"
+promote_channel="$(jq -r '.params.promote_to' < "${payload}")"
+
+results_file=`find $1 -type f -name ${origin}_${name}`
+
+version="$(jq -r '.version.ref' < "${results_file}")"
+
+export HAB_ORIGIN=${origin}
+export HAB_AUTH_TOKEN="$(jq -r '.source.auth_token' < "${payload}")"
+
+hab origin key download ${origin}
+
+echo "Promoting '${origin}/${name}/${version}' from channel '${channel}' to channel ''${promote_channel}'"
+
+hab pkg promote "${origin}/${name}/${version}" "${promote_channel}"
+
+jq -n --arg version "${version}" '{version: { ref: $version }}' >&3
