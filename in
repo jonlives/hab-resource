@@ -16,7 +16,7 @@ source_uri="$(jq -r '.source.bldr_url' < "${payload}")"
 if [[ source_uri =~ .*http.* ]]; then
     base_uri=$source_uri
 else
-    base_uri="https://bldr.habitat.sh/v1/depot/"
+    base_uri="https://bldr.habitat.sh/v1/depot"
 fi
 
 origin="$(jq -r '.source.origin' < "${payload}")"
