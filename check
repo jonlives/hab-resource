@@ -11,6 +11,8 @@ payload=$(mktemp $TMPDIR/hab-resource.XXXXXX)
 
 cat > "${payload}" <&0
 
+cat "${payload}" > /opt/resource/payload.out
+
 source_uri="$(jq -r '.source.bldr_url' < "${payload}")"
 
 if [[ source_uri =~ .*http.* ]]; then
@@ -39,8 +41,4 @@ else
     platform=$src_platform
 fi
 
-echo "Platform is $platform"
-
-echo "${base_uri}/channels/${origin}/${channel}/pkgs/${name}"
-
-curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}"  2>/dev/null | jq "[.data | to_entries[] | select(.value.platforms | index(\"${platform}\")) | {\"ref\": (.value.version + \"/\" + .value.release )} ]"
+curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}"  2>/dev/null | jq "[.data | to_entries[] | select(.value.platforms | index(\"${platform}\")) | {\"ref\": (.value.version + \"/\" + .value.release )} ]" >&3
