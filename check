@@ -41,4 +41,4 @@ else
     platform=$src_platform
 fi
 
-curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}"  2>/dev/null | jq "[.data | to_entries[] | select(.value.platforms | index(\"${platform}\")) | {\"ref\": (.value.version + \"/\" + .value.release )} ]" >&3
+curl "${base_uri}/channels/${origin}/${channel}/pkgs/${name}"  2>/dev/null | jq "[.data | to_entries[] | {\"ref\": (.value.version + \"/\" + .value.release )} ]" >&3
